@@ -25,9 +25,11 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <>
-      <Title title="Tienda" subtitle="Todos los productos" className="mb-2" />
-      <ProductGrid products={products} />
-      <Pagination totalPages={totalPages} />
+      <Title
+        title="Expense App"
+        subtitle="Pagina de ingreso y administracion de gastos de IASD Las Condes"
+        className="mb-2"
+      />
     </>
   );
 }

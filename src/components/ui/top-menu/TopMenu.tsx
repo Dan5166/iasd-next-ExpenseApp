@@ -6,6 +6,7 @@ import { IoSearchOutline, IoCartOutline } from "react-icons/io5";
 
 import { titleFont } from "@/config/fonts";
 import { useCartStore, useUIStore } from "@/store";
+import { useSession } from "next-auth/react";
 // import { useCartStore, useUIStore } from "@/store";
 
 export const TopMenu = () => {
@@ -13,6 +14,10 @@ export const TopMenu = () => {
   const totalItemsInCart = useCartStore((state) => state.getTotalItems());
 
   const [loaded, setLoaded] = useState(false);
+
+  const { data: session } = useSession();
+  const isAuthenticated = !!session?.user;
+  const isAdmin = session?.user.role === "admin";
 
   useEffect(() => {
     setLoaded(true);
@@ -24,32 +29,46 @@ export const TopMenu = () => {
       <div>
         <Link href="/">
           <span className={`${titleFont.className} antialiased font-bold`}>
-            Teslo
+            IASD
           </span>
-          <span> | Shop</span>
+          <span> | ExpenseApp</span>
         </Link>
       </div>
 
       {/* Center Menu */}
       <div className="hidden sm:block">
-        <Link
-          className="m-2 p-2 rounded-md transition-all hover:bg-gray-100"
-          href="/gender/men"
-        >
-          Hombres
-        </Link>
-        <Link
-          className="m-2 p-2 rounded-md transition-all hover:bg-gray-100"
-          href="/gender/women"
-        >
-          Mujeres
-        </Link>
-        <Link
-          className="m-2 p-2 rounded-md transition-all hover:bg-gray-100"
-          href="/gender/kid"
-        >
-          Niños
-        </Link>
+        {isAuthenticated && (
+          <Link
+            className="m-2 p-2 rounded-md transition-all hover:bg-gray-100"
+            href="/expense/new"
+          >
+            Agregar Gasto
+          </Link>
+        )}
+        {isAuthenticated && (
+          <Link
+            className="m-2 p-2 rounded-md transition-all hover:bg-gray-100"
+            href="/drafts"
+          >
+            Borradores
+          </Link>
+        )}
+        {isAdmin && (
+          <Link
+            className="m-2 p-2 rounded-md transition-all hover:bg-gray-100"
+            href="/expenses"
+          >
+            Ver Gastos
+          </Link>
+        )}
+        {isAdmin && (
+          <Link
+            className="m-2 p-2 rounded-md transition-all hover:bg-gray-100"
+            href="/dashboard"
+          >
+            Dashboard
+          </Link>
+        )}
       </div>
 
       {/* Search, Cart, Menu */}

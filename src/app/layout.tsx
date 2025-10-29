@@ -5,10 +5,11 @@ import { Provider } from "@/components";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s - Teslo | shop",
-    default: "Home - Teslo | shop",
+    template: "%s - Iasd | ExpenseApp",
+    default: "Home - Iasd | ExpenseApp",
   },
-  description: "Una tienda virtual de productos",
+  description:
+    "Pagina de ingreso y administracion de gastos de IASD Las Condes",
 };
 
 export default function RootLayout({
