@@ -16,11 +16,14 @@ export default async function ProfilePage() {
       <div className="bg-white shadow-md rounded-2xl p-8 max-w-md w-full text-center">
         <div className="flex justify-center mb-6">
           <div className="relative w-28 h-28">
-            <Image
-              src={user.image ?? "/default-avatar.png"} // puedes crear esta imagen en /public
-              alt={user.name ?? "Usuario"}
-              fill
-              className="rounded-full object-cover border-4 border-indigo-200"
+            <img
+              src={
+                user.image && user.image.trim() !== ""
+                  ? user.image
+                  : "/window.svg"
+              }
+              alt={user.name || "Usuario"}
+              className="rounded-full object-cover border-4 border-indigo-200 w-full h-full"
             />
           </div>
         </div>
@@ -32,7 +35,7 @@ export default async function ProfilePage() {
 
         <div className="mt-6">
           <span className="inline-block bg-indigo-100 text-indigo-800 text-sm font-medium px-3 py-1 rounded-full">
-            {user.role ?? "Usuario"}
+            {user.role ?? "No role"}
           </span>
         </div>
 

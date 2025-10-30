@@ -1,11 +1,13 @@
 // app/admin/gastos/page.tsx
 import { fetchEventos } from "@/actions";
+import clsx from "clsx";
 import { format } from "date-fns";
 import Link from "next/link";
 import {
   IoCheckmarkCircleOutline,
   IoCloseCircleOutline,
   IoDocumentOutline,
+  IoKeyOutline,
 } from "react-icons/io5";
 
 export default async function Page() {
@@ -52,7 +54,7 @@ export default async function Page() {
               <div className="px-6 py-4 bg-gray-50 flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-800">
-                    {evento.nombre || "Evento sin nombre"}
+                    {evento.eventName || "Evento sin nombre"}
                   </h2>
                   <p className="text-sm text-gray-500">
                     Creado:{" "}
@@ -77,7 +79,12 @@ export default async function Page() {
                 {evento.gastos.map((gasto: any, i: number) => (
                   <div
                     key={i}
-                    className="px-6 py-4 flex justify-between items-start"
+                    className={clsx(
+                      "px-6 py-4 flex justify-between items-start",
+                      {
+                        "bg-red-100": !gasto.receiptUrl,
+                      }
+                    )}
                   >
                     <div className="w-full flex flex-col gap-4">
                       <div className="flex justify-between">
@@ -87,30 +94,55 @@ export default async function Page() {
                             currency: "CLP",
                           })}
                         </p>
-                        <div className="flex gap-4">
-                          {/* Ver boleta */}
-                          <button
-                            className="text-gray-600 hover:text-blue-600 transition-colors"
-                            title="Ver boleta"
-                          >
-                            <IoDocumentOutline size={22} />
-                          </button>
+                        <div className="flex gap-8 items-center">
+                          <div className="flex gap-4">
+                            {/* Ver boleta */}
+                            {gasto.receiptUrl && (
+                              <a
+                                className="text-gray-600 hover:text-blue-600 transition-colors"
+                                title="Ver boleta"
+                                target="_blank"
+                                href={gasto.receiptUrl}
+                              >
+                                <IoDocumentOutline size={22} />
+                              </a>
+                            )}
+                            {!gasto.receiptUrl && (
+                              <button
+                                className="text-red-600 hover:red-blue-700 transition-colors"
+                                title="No hay boleta subida"
+                              >
+                                <IoDocumentOutline size={22} />
+                              </button>
+                            )}
+                            {gasto.amount > 150000 && (
+                              <Link
+                                className="text-gray-600 hover:text-blue-600 transition-colors"
+                                title="Ver aprobacion del pastor"
+                                href="/pastor-aprove-[id]"
+                              >
+                                <IoKeyOutline size={22} />
+                              </Link>
+                            )}
+                          </div>
 
-                          {/* Aprobar */}
-                          <button
-                            className="text-gray-600 hover:text-green-600 transition-colors"
-                            title="Aprobar"
-                          >
-                            <IoCheckmarkCircleOutline size={22} />
-                          </button>
+                          <div className="flex gap-2">
+                            {/* Aprobar */}
+                            <button
+                              className="text-gray-600 hover:text-green-600 transition-colors"
+                              title="Aprobar"
+                            >
+                              <IoCheckmarkCircleOutline size={22} />
+                            </button>
 
-                          {/* Rechazar */}
-                          <button
-                            className="text-gray-600 hover:text-red-600 transition-colors"
-                            title="Rechazar"
-                          >
-                            <IoCloseCircleOutline size={22} />
-                          </button>
+                            {/* Rechazar */}
+                            <button
+                              className="text-gray-600 hover:text-red-600 transition-colors"
+                              title="Rechazar"
+                            >
+                              <IoCloseCircleOutline size={22} />
+                            </button>
+                          </div>
                         </div>
                       </div>
 

@@ -16,6 +16,7 @@ interface GastoInput {
 
 export async function createEventoGasto(
   gastosInput: GastoInput[], // ← es un array, no un objeto con .gastos
+  eventName: string,
   status?: string
 ) {
   try {
@@ -29,6 +30,7 @@ export async function createEventoGasto(
     }));
 
     const eventoGasto = {
+      eventName: eventName,
       createdAt: now.toDate(), // <-- aquí
       modified: now.toDate(),
       status: status ?? "pendiente",

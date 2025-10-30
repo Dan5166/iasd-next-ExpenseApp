@@ -5,10 +5,14 @@ export interface Distribution {
 }
 
 export interface Gasto {
-  status?: string;
+  status: "draft" | "submitted" | "approved";
   amount: number;
-  createdAt?: Date;
-  distribution: Distribution[];
+  distribution: {
+    ministeryId: string;
+    percent: number;
+    approvedByDirector: boolean;
+  }[];
+  receiptUrl?: string; // 🔹 enlace a la boleta en Storage
 }
 
 export interface EventoGasto {

@@ -16,6 +16,7 @@ export async function fetchEventos() {
 
       return {
         id: doc.id,
+        eventName: data.eventName,
         createdAt: serializeTimestamp(data.createdAt),
         modified: serializeTimestamp(data.modified),
         status: data.status,

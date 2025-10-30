@@ -8,3 +8,4 @@ export * from "./product/get-stock-by-slug";
 
 export * from "./gasto/createEventoGasto";
 export * from "./gasto/fetchEventos";
+export * from "./gasto/uploadBoleta";

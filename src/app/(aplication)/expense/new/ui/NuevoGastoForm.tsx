@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { createEventoGasto } from "@/actions";
+import { uploadBoleta } from "@/actions/gasto/uploadBoleta";
 import { Gasto } from "@/interfaces";
+import clsx from "clsx";
 
 interface DistributionInput {
   ministeryId: string;
@@ -11,23 +13,29 @@ interface DistributionInput {
 }
 
 export default function NuevoEventoGastoForm() {
-  const [amount, setAmount] = useState("");
+  const [eventName, setEventName] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
   const [distributions, setDistributions] = useState<DistributionInput[]>([]);
   const [ministeryId, setMinisteryId] = useState("");
-  const [percent, setPercent] = useState("");
+  const [percent, setPercent] = useState<string>("");
   const [gastos, setGastos] = useState<Gasto[]>([]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
 
-  // ➕ Agregar distribución
+  // Estado para la boleta
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [receiptUrl, setReceiptUrl] = useState<string | undefined>(undefined);
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
+
   const handleAddDistribution = () => {
-    if (!ministeryId || !percent) return;
+    const percentNum = Number(percent);
+    if (!ministeryId || percentNum <= 0) return;
 
     setDistributions((prev) => [
       ...prev,
       {
         ministeryId,
-        percent: Number(percent),
+        percent: percentNum,
         approvedByDirector: false,
       },
     ]);
@@ -36,50 +44,103 @@ export default function NuevoEventoGastoForm() {
     setPercent("");
   };
 
-  // 🗑️ Eliminar distribución
   const handleRemoveDistribution = (index: number) => {
     setDistributions((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // ➕ Agregar gasto completo
+  const handleBoletaChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingReceipt(true);
+    const res = await uploadBoleta(file);
+    setUploadingReceipt(false);
+
+    if (res.success) {
+      setReceiptFile(file);
+      setReceiptUrl(res.url);
+    } else {
+      alert("Error subiendo boleta: " + res.error);
+    }
+  };
+
   const handleAddGasto = () => {
-    if (!amount || distributions.length === 0) return;
+    const amountNum = Number(amount);
+    if (amountNum <= 0 || distributions.length === 0) return;
 
     const newGasto: Gasto = {
       status: "draft",
-      amount: Number(amount),
+      amount: amountNum,
       distribution: distributions,
+      receiptUrl: receiptUrl ?? undefined, // 🔥 añadimos la URL de la boleta
     };
 
     setGastos((prev) => [...prev, newGasto]);
     setAmount("");
     setDistributions([]);
+    setReceiptFile(null);
+    setReceiptUrl(undefined);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (gastos.length === 0) return alert("Agrega al menos un gasto");
+    if (eventName === "") return alert("Agrega un nombre para el evento");
 
     setLoading(true);
 
-    const res = await createEventoGasto(gastos, "draft");
+    const res = await createEventoGasto(gastos, eventName, "draft");
 
     setResult(res);
     setGastos([]);
     setLoading(false);
+    setEventName("");
   };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
+      <label className="block mb-1 font-medium">Nombre del evento</label>
+      <input
+        type="text"
+        placeholder="Ej: Retiro de Jovenes"
+        value={eventName}
+        onChange={(e) => setEventName(e.target.value)}
+        className="border rounded-md w-full p-2"
+      />
       {/* Monto del gasto */}
       <div>
         <label className="block mb-1 font-medium">Monto del gasto</label>
         <input
           type="number"
+          placeholder="Ej: 50000"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className="border rounded-md w-full p-2"
         />
+      </div>
+
+      {/* Boleta */}
+      <div>
+        <label className="block mb-1 font-medium">Boleta (PDF o imagen)</label>
+        <input
+          type="file"
+          accept="image/*,.pdf"
+          onChange={handleBoletaChange}
+          className="border rounded-md w-full p-2"
+        />
+        {uploadingReceipt && (
+          <p className="text-sm text-gray-500">Subiendo...</p>
+        )}
+        {receiptUrl && (
+          <a
+            href={receiptUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 text-sm underline"
+          >
+            Ver boleta subida
+          </a>
+        )}
       </div>
 
       {/* Distribuciones */}
@@ -134,15 +195,26 @@ export default function NuevoEventoGastoForm() {
       <button
         type="button"
         onClick={handleAddGasto}
-        className="bg-gray-600 text-white px-4 py-2 rounded-md"
+        className="bg-gray-600 text-white px-4 py-2 rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed"
+        disabled={
+          distributions.length === 0 || Number(amount) <= 0 || amount === ""
+        }
       >
         Agregar gasto
       </button>
 
       {/* Lista de gastos */}
-      {gastos.length > 0 && (
-        <div className="mt-4 border p-2 rounded">
-          <h3 className="font-semibold mb-2">Gastos agregados:</h3>
+      <div className="mt-4 border p-2 rounded">
+        <h3
+          className={clsx("font-semibold mb-2", {
+            "text-red-600": !(gastos.length > 0),
+          })}
+        >
+          {gastos.length > 0
+            ? "Gastos agregados:"
+            : "⚠ No hay gastos agregados"}
+        </h3>
+        {gastos.length > 0 && (
           <ul className="list-disc pl-5 text-sm space-y-1">
             {gastos.map((g, i) => (
               <li key={i}>
@@ -154,20 +226,36 @@ export default function NuevoEventoGastoForm() {
                 {g.distribution
                   .map((d) => `${d.ministeryId} (${d.percent}%)`)
                   .join(", ")}
+                {g.receiptUrl && (
+                  <>
+                    {" "}
+                    —{" "}
+                    <a
+                      href={g.receiptUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline"
+                    >
+                      Ver boleta
+                    </a>
+                  </>
+                )}
               </li>
             ))}
           </ul>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Enviar */}
-      <button
-        type="submit"
-        disabled={loading}
-        className="bg-indigo-600 text-white px-4 py-2 rounded-md"
-      >
-        {loading ? "Guardando..." : "Crear evento"}
-      </button>
+      {eventName !== "" && gastos.length > 0 && (
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-indigo-600 text-white px-4 py-2 rounded-md"
+        >
+          {loading ? "Guardando..." : "Crear evento"}
+        </button>
+      )}
 
       {result && (
         <pre className="bg-gray-50 p-2 mt-4 text-sm rounded">

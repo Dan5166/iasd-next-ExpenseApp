@@ -77,7 +77,7 @@ export const TopMenu = () => {
           <IoSearchOutline className="w-5 h-5" />
         </Link>
 
-        <Link
+        {/* <Link
           href={totalItemsInCart === 0 && loaded ? "/empty" : "/cart"}
           className="mx-2"
         >
@@ -89,7 +89,7 @@ export const TopMenu = () => {
             )}
             <IoCartOutline className="w-5 h-5" />
           </div>
-        </Link>
+        </Link> */}
 
         <button
           onClick={() => {
