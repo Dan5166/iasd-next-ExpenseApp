@@ -13,6 +13,9 @@ export interface Gasto {
     approvedByDirector: boolean;
   }[];
   receiptUrl?: string; // 🔹 enlace a la boleta en Storage
+  description?: string;
+  eventId?: string | null;
+  userId?: string;
 }
 
 export interface EventoGasto {

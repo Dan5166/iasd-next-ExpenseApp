@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { createEventoGasto } from "@/actions";
+import { createGasto } from "@/actions/gasto/createGasto";
 import { uploadBoleta } from "@/actions/gasto/uploadBoleta";
-import { Gasto } from "@/interfaces";
-import clsx from "clsx";
 
 interface DistributionInput {
   ministeryId: string;
@@ -12,13 +10,12 @@ interface DistributionInput {
   approvedByDirector: boolean;
 }
 
-export default function NuevoEventoGastoForm() {
-  const [eventName, setEventName] = useState<string>("");
+export default function NuevoGastoForm({ eventoId }: { eventoId?: string }) {
   const [amount, setAmount] = useState<string>("");
   const [distributions, setDistributions] = useState<DistributionInput[]>([]);
   const [ministeryId, setMinisteryId] = useState("");
   const [percent, setPercent] = useState<string>("");
-  const [gastos, setGastos] = useState<Gasto[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
 
@@ -27,6 +24,7 @@ export default function NuevoEventoGastoForm() {
   const [receiptUrl, setReceiptUrl] = useState<string | undefined>(undefined);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
 
+  // 👇 añadir distribución
   const handleAddDistribution = () => {
     const percentNum = Number(percent);
     if (!ministeryId || percentNum <= 0) return;
@@ -48,6 +46,7 @@ export default function NuevoEventoGastoForm() {
     setDistributions((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // 👇 subir boleta
   const handleBoletaChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -64,50 +63,41 @@ export default function NuevoEventoGastoForm() {
     }
   };
 
-  const handleAddGasto = () => {
-    const amountNum = Number(amount);
-    if (amountNum <= 0 || distributions.length === 0) return;
-
-    const newGasto: Gasto = {
-      status: "draft",
-      amount: amountNum,
-      distribution: distributions,
-      receiptUrl: receiptUrl ?? undefined, // 🔥 añadimos la URL de la boleta
-    };
-
-    setGastos((prev) => [...prev, newGasto]);
-    setAmount("");
-    setDistributions([]);
-    setReceiptFile(null);
-    setReceiptUrl(undefined);
-  };
-
+  // 👇 enviar gasto único a Firestore
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (gastos.length === 0) return alert("Agrega al menos un gasto");
-    if (eventName === "") return alert("Agrega un nombre para el evento");
+
+    const amountNum = Number(amount);
+    if (amountNum <= 0) return alert("El monto debe ser mayor a 0");
+    if (distributions.length === 0)
+      return alert("Agrega al menos una distribución");
 
     setLoading(true);
 
-    const res = await createEventoGasto(gastos, eventName, "draft");
+    const res = await createGasto({
+      amount: amountNum,
+      status: "draft",
+      eventId: eventoId ?? null,
+      description: "",
+      distribution: distributions,
+      receiptUrl: receiptUrl,
+    });
 
-    setResult(res);
-    setGastos([]);
     setLoading(false);
-    setEventName("");
+    setResult(res);
+
+    // Reiniciar formulario
+    if (res.success) {
+      setAmount("");
+      setDistributions([]);
+      setReceiptFile(null);
+      setReceiptUrl(undefined);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
-      <label className="block mb-1 font-medium">Nombre del evento</label>
-      <input
-        type="text"
-        placeholder="Ej: Retiro de Jovenes"
-        value={eventName}
-        onChange={(e) => setEventName(e.target.value)}
-        className="border rounded-md w-full p-2"
-      />
-      {/* Monto del gasto */}
+      {/* Monto */}
       <div>
         <label className="block mb-1 font-medium">Monto del gasto</label>
         <input
@@ -143,7 +133,7 @@ export default function NuevoEventoGastoForm() {
         )}
       </div>
 
-      {/* Distribuciones */}
+      {/* Distribución */}
       <div className="border rounded-md p-3">
         <h3 className="font-semibold mb-2">Distribuciones</h3>
 
@@ -191,71 +181,14 @@ export default function NuevoEventoGastoForm() {
         )}
       </div>
 
-      {/* Botón agregar gasto */}
+      {/* Guardar */}
       <button
-        type="button"
-        onClick={handleAddGasto}
-        className="bg-gray-600 text-white px-4 py-2 rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed"
-        disabled={
-          distributions.length === 0 || Number(amount) <= 0 || amount === ""
-        }
+        type="submit"
+        disabled={loading}
+        className="bg-indigo-600 text-white px-4 py-2 rounded-md w-full"
       >
-        Agregar gasto
+        {loading ? "Guardando..." : "Guardar gasto"}
       </button>
-
-      {/* Lista de gastos */}
-      <div className="mt-4 border p-2 rounded">
-        <h3
-          className={clsx("font-semibold mb-2", {
-            "text-red-600": !(gastos.length > 0),
-          })}
-        >
-          {gastos.length > 0
-            ? "Gastos agregados:"
-            : "⚠ No hay gastos agregados"}
-        </h3>
-        {gastos.length > 0 && (
-          <ul className="list-disc pl-5 text-sm space-y-1">
-            {gastos.map((g, i) => (
-              <li key={i}>
-                {g.amount.toLocaleString("es-CL", {
-                  style: "currency",
-                  currency: "CLP",
-                })}{" "}
-                —{" "}
-                {g.distribution
-                  .map((d) => `${d.ministeryId} (${d.percent}%)`)
-                  .join(", ")}
-                {g.receiptUrl && (
-                  <>
-                    {" "}
-                    —{" "}
-                    <a
-                      href={g.receiptUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      Ver boleta
-                    </a>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* Enviar */}
-      {eventName !== "" && gastos.length > 0 && (
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-md"
-        >
-          {loading ? "Guardando..." : "Crear evento"}
-        </button>
-      )}
 
       {result && (
         <pre className="bg-gray-50 p-2 mt-4 text-sm rounded">

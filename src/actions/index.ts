@@ -2,10 +2,7 @@ export * from "./auth/login";
 export * from "./auth/logout";
 export * from "./auth/register";
 
-export * from "./product/product-pagination";
-export * from "./product/get-product-by-slug";
-export * from "./product/get-stock-by-slug";
-
+export * from "./gasto/createGasto";
 export * from "./gasto/createEventoGasto";
 export * from "./gasto/fetchEventos";
 export * from "./gasto/uploadBoleta";

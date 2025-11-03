@@ -48,25 +48,9 @@ export const TopMenu = () => {
         {isAuthenticated && (
           <Link
             className="m-2 p-2 rounded-md transition-all hover:bg-gray-100"
-            href="/drafts"
+            href="/eventos"
           >
-            Borradores
-          </Link>
-        )}
-        {isAdmin && (
-          <Link
-            className="m-2 p-2 rounded-md transition-all hover:bg-gray-100"
-            href="/expenses"
-          >
-            Ver Gastos
-          </Link>
-        )}
-        {isAdmin && (
-          <Link
-            className="m-2 p-2 rounded-md transition-all hover:bg-gray-100"
-            href="/dashboard"
-          >
-            Dashboard
+            Eventos
           </Link>
         )}
       </div>

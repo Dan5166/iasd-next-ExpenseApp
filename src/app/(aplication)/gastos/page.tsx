@@ -1,3 +1,4 @@
+import { fetchUnassignedGastos } from "@/actions/gasto/fetchUnassignedGastos";
 import { fetchAllGastos } from "@/actions/gasto/fetchAllGastos";
 
 export default async function GastosPage() {

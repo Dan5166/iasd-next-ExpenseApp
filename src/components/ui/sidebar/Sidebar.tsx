@@ -6,14 +6,15 @@ import clsx from "clsx";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
+  IoBarChartOutline,
+  IoCalendarOutline,
   IoCloseOutline,
   IoLogInOutline,
   IoLogOutOutline,
   IoPeopleOutline,
   IoPersonOutline,
   IoSearchOutline,
-  IoShirtOutline,
-  IoTicketOutline,
+  IoWalletOutline,
 } from "react-icons/io5";
 
 export function Sidebar() {
@@ -81,13 +82,6 @@ export function Sidebar() {
               <IoPersonOutline size={30} />
               <span className="ml-3 text-xl">Perfil</span>
             </Link>
-            <Link
-              href="/"
-              className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-            >
-              <IoTicketOutline size={30} />
-              <span className="ml-3 text-xl">Ordenes</span>
-            </Link>
           </>
         )}
 
@@ -104,16 +98,38 @@ export function Sidebar() {
           </Link>
         )}
         {isAuthenticated && (
-          <button
-            className="flex w-full items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-            onClick={() => {
-              handleLogout();
-              closeMenu();
-            }}
-          >
-            <IoLogOutOutline size={30} />
-            <span className="ml-3 text-xl">Salir</span>
-          </button>
+          <>
+            <Link
+              href="/eventos"
+              onClick={() => {
+                closeMenu();
+              }}
+              className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
+            >
+              <IoCalendarOutline size={30} />
+              <span className="ml-3 text-xl">Eventos</span>
+            </Link>
+            <Link
+              href="/gastos"
+              onClick={() => {
+                closeMenu();
+              }}
+              className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
+            >
+              <IoWalletOutline size={30} />
+              <span className="ml-3 text-xl">Gastos</span>
+            </Link>
+            <button
+              className="flex w-full items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
+              onClick={() => {
+                handleLogout();
+                closeMenu();
+              }}
+            >
+              <IoLogOutOutline size={30} />
+              <span className="ml-3 text-xl">Salir</span>
+            </button>
+          </>
         )}
         {isAdmin && (
           <>
@@ -123,22 +139,15 @@ export function Sidebar() {
               href="/"
               className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
             >
-              <IoShirtOutline size={30} />
-              <span className="ml-3 text-xl">Productos</span>
-            </Link>
-            <Link
-              href="/"
-              className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-            >
-              <IoTicketOutline size={30} />
-              <span className="ml-3 text-xl">Ordenes</span>
+              <IoBarChartOutline size={30} />
+              <span className="ml-3 text-xl">Dashboard</span>
             </Link>
             <Link
               href="/"
               className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
             >
               <IoPeopleOutline size={30} />
-              <span className="ml-3 text-xl">Usuarios</span>
+              <span className="ml-3 text-xl">Admin</span>
             </Link>
           </>
         )}

@@ -1,8 +1,6 @@
 export const revalidate = 60;
 
-import { getPaginatedProductsWithImages } from "@/actions";
-import { Pagination, ProductGrid, Title } from "@/components";
-import { redirect } from "next/navigation";
+import { Title } from "@/components";
 
 interface Props {
   searchParams: {
@@ -15,21 +13,13 @@ export default async function Home({ searchParams }: Props) {
 
   const page = resolvedParams.page ? parseInt(resolvedParams.page) : 1;
 
-  const { products, totalPages } = await getPaginatedProductsWithImages({
-    page,
-  });
-
-  if (products.length === 0) {
-    redirect("/");
-  }
-
   return (
-    <>
+    <div className="container p-2 mx-auto">
       <Title
         title="Expense App"
         subtitle="Pagina de ingreso y administracion de gastos de IASD Las Condes"
         className="mb-2"
       />
-    </>
+    </div>
   );
 }
