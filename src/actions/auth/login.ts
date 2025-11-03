@@ -1,9 +1,7 @@
 "use server";
 
 import { signIn } from "@/auth.config";
-import { sleep } from "@/utils";
 import { AuthError } from "next-auth";
-import { redirect } from "next/navigation";
 
 type AuthState = {
   error?: string;

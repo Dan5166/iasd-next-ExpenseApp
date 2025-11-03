@@ -42,8 +42,8 @@ export async function createEvento({
     await batch.commit();
 
     return { success: true, id: eventoRef.id };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error creando evento:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: "Error creando evento" };
   }
 }
