@@ -32,8 +32,8 @@ export async function uploadBoleta(file: File) {
     });
 
     return { success: true, url: signedUrl };
-  } catch (err: any) {
-    console.error("Error subiendo boleta:", err);
-    return { success: false, error: err.message };
+  } catch (error) {
+    console.error("Error subiendo boleta:", error);
+    return { success: false, error: "Error subiendo boleta" };
   }
 }

@@ -17,7 +17,29 @@ interface GastoInput {
   receiptUrl?: string;
 }
 
-export async function createGasto(gastoInput: GastoInput) {
+interface GastoData {
+  eventId: string | null;
+  description: string;
+  amount: number;
+  createdAt: string; // ISO
+  modifiedAt: string; // ISO
+  userId: string;
+  status: string;
+  distribution: {
+    ministeryId: string;
+    percent: number;
+    approvedByDirector: boolean;
+  }[];
+  receiptUrl: string | null;
+}
+
+type ActionResult<T> =
+  | { success: true; id?: string; data?: T }
+  | { success: false; error: string };
+
+export async function createGasto(
+  gastoInput: GastoInput
+): Promise<ActionResult<GastoData>> {
   try {
     const now = Timestamp.now();
 
@@ -35,8 +57,8 @@ export async function createGasto(gastoInput: GastoInput) {
 
     const ref = await adminDB.collection("gastos").add(gasto);
 
-    // ⚠️ Conversión segura antes de devolver al cliente
-    const plainData = {
+    // ⚙️ Versión serializable
+    const plainData: GastoData = {
       ...gasto,
       createdAt: now.toDate().toISOString(),
       modifiedAt: now.toDate().toISOString(),
@@ -45,16 +67,13 @@ export async function createGasto(gastoInput: GastoInput) {
     return {
       success: true,
       id: ref.id,
-      data: plainData, // ✅ serializable
+      data: plainData,
     };
   } catch (error) {
-    console.error("Error obteniendo eventos:", error);
+    console.error("Error creando gasto:", error);
 
-    let message = "Error desconocido";
-
-    if (error instanceof Error) {
-      message = error.message;
-    }
+    const message =
+      error instanceof Error ? error.message : "Error desconocido";
 
     return { success: false, error: message };
   }

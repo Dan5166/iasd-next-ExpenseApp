@@ -28,8 +28,8 @@ export async function fetchUnassignedGastos() {
     });
 
     return { success: true, data: gastos };
-  } catch (error: any) {
-    console.error("Error obteniendo gastos:", error);
-    return { success: false, data: [], error: error.message };
+  } catch (error) {
+    console.error("Error fetching unassigned gastos:", error);
+    return { success: false, error: "Error fetching unassigned gastos" };
   }
 }

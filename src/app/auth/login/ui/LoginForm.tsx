@@ -3,7 +3,7 @@
 import { authenticate } from "@/actions";
 import clsx from "clsx";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { IoWarning } from "react-icons/io5";
 
@@ -19,7 +19,7 @@ export default function LoginForm() {
     if (state?.success && state?.callbackUrl) {
       window.location.replace(callbackUrl ? callbackUrl : "/");
     }
-  }, [state]);
+  }, [state, callbackUrl]);
   return (
     <form action={formAction} className="flex flex-col">
       <label htmlFor="email">Correo electrónico</label>

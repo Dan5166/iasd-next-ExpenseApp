@@ -3,6 +3,17 @@ import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import { loginEmailPassFirebase } from "./lib/firebaseClient";
 import { adminAuth } from "./lib/firebaseAdmin";
+import { Session, User, AdapterUser } from "next-auth";
+import { JWT } from "next-auth/jwt";
+
+interface JWTData {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  role: string;
+  image?: string;
+}
 
 // Rutas que requieren que el usuario esté autenticado (cualquier rol)
 const authenticatedRoutes = [
@@ -87,16 +98,24 @@ export const authConfig: NextAuthConfig = {
         return true;
       }
     },
-    jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: User }) {
       if (user) {
-        token.data = user;
+        token.data = {
+          id: user.id,
+          name: user.name!,
+          email: user.email!,
+          emailVerified: user.emailVerified ?? false,
+          role: (user as any).role ?? "user", // si tu modelo User tiene `role`
+          image: user.image,
+        };
       }
-
       return token;
     },
 
-    session({ session, token, user }) {
-      session.user = token.data as any;
+    async session({ session, token }: { session: Session; token: JWT }) {
+      if (token.data) {
+        session.user = token.data;
+      }
       return session;
     },
   },

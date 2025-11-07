@@ -2,17 +2,33 @@ import { adminDB } from "@/lib/firebaseAdmin";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import EditarEventoForm from "./ui/EditEventoForm";
+import { Timestamp } from "firebase-admin/firestore";
 
-function parseFirestoreDate(dateValue: any): Date | null {
+type FirestoreDateInput = Timestamp | string | number | Date | null | undefined;
+
+interface Evento {
+  nombre: string;
+  fecha: Timestamp | Date | string | number;
+  createdAt: Timestamp | Date | string | number;
+  updatedAt: Timestamp | Date | string | number;
+  gastoIds: string[];
+}
+
+// TODO: Mejorar sintaxis, revisar efectivamente el tipo
+function parseFirestoreDate(dateValue: FirestoreDateInput): Date | null {
   if (!dateValue) return null;
 
-  if (typeof dateValue.toDate === "function") {
+  if (dateValue instanceof Timestamp) {
     return dateValue.toDate();
   }
 
   if (typeof dateValue === "string" || typeof dateValue === "number") {
     const parsed = new Date(dateValue);
     return isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  if (dateValue instanceof Date) {
+    return dateValue;
   }
 
   return null;
@@ -34,13 +50,7 @@ export default async function EventoDetallePage({
     return <div className="p-8 text-red-600">Evento no encontrado.</div>;
   }
 
-  const evento = eventoSnap.data() as {
-    nombre?: string;
-    fecha?: any;
-    createdAt?: any;
-    updatedAt?: any;
-    gastoIds?: string[];
-  };
+  const evento = eventoSnap.data() as Evento;
 
   const fecha = parseFirestoreDate(evento.fecha);
   const createdAt = parseFirestoreDate(evento.createdAt);

@@ -11,7 +11,7 @@ interface Props {
 export default async function Home({ searchParams }: Props) {
   const resolvedParams = await searchParams;
 
-  const page = resolvedParams.page ? parseInt(resolvedParams.page) : 1;
+  // const page = resolvedParams.page ? parseInt(resolvedParams.page) : 1;
 
   return (
     <div className="container p-2 mx-auto">
