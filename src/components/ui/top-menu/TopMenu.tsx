@@ -1,27 +1,26 @@
 "use client";
-import { useEffect, useState } from "react";
 
 import Link from "next/link";
-import { IoSearchOutline, IoCartOutline } from "react-icons/io5";
+import { IoSearchOutline } from "react-icons/io5";
 
 import { titleFont } from "@/config/fonts";
-import { useCartStore, useUIStore } from "@/store";
+import { useUIStore } from "@/store"; // useCartStore,
 import { useSession } from "next-auth/react";
 // import { useCartStore, useUIStore } from "@/store";
 
 export const TopMenu = () => {
   const openMenu = useUIStore((state) => state.openSideMenu);
-  const totalItemsInCart = useCartStore((state) => state.getTotalItems());
+  // const totalItemsInCart = useCartStore((state) => state.getTotalItems());
 
-  const [loaded, setLoaded] = useState(false);
+  // const [loaded, setLoaded] = useState(false);
 
   const { data: session } = useSession();
   const isAuthenticated = !!session?.user;
-  const isAdmin = session?.user.role === "admin";
+  // const isAdmin = session?.user.role === "admin";
 
-  useEffect(() => {
-    setLoaded(true);
-  }, []);
+  // useEffect(() => {
+  //   setLoaded(true);
+  // }, []);
 
   return (
     <nav className="flex px-5 justify-between items-center w-full">

@@ -17,7 +17,7 @@ interface GastoInput {
   receiptUrl?: string;
 }
 
-interface GastoData {
+export interface GastoData {
   eventId: string | null;
   description: string;
   amount: number;
@@ -33,7 +33,7 @@ interface GastoData {
   receiptUrl: string | null;
 }
 
-type ActionResult<T> =
+export type ActionResult<T> =
   | { success: true; id?: string; data?: T }
   | { success: false; error: string };
 

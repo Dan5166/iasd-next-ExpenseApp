@@ -27,15 +27,13 @@ export default function GastoItem({ evento }: Props) {
             </h2>
             <p className="text-gray-500">
               Ministerio:{" "}
-              {gasto.distribution?.map((d: any) => d.ministeryId).join(", ")}
+              {gasto.distribution?.map((d) => d.ministeryId).join(", ")}
             </p>
           </div>
           <div>
             <span className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">
               {gasto.distribution
-                ?.map((d: any) =>
-                  d.approvedByDirector ? "Aprobado" : "Pendiente"
-                )
+                ?.map((d) => (d.approvedByDirector ? "Aprobado" : "Pendiente"))
                 .join(", ")}
             </span>
           </div>

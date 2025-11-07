@@ -6,15 +6,6 @@ import { adminAuth } from "./lib/firebaseAdmin";
 import { Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
-interface JWTData {
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: boolean;
-  role: string;
-  image?: string;
-}
-
 // Rutas que requieren que el usuario esté autenticado (cualquier rol)
 const authenticatedRoutes = [
   "/checkout/address",
@@ -105,7 +96,7 @@ export const authConfig: NextAuthConfig = {
           name: user.name!,
           email: user.email!,
           emailVerified: user.emailVerified ?? false,
-          role: (user as any).role ?? "user", // si tu modelo User tiene `role`
+          role: user.role as string,
           image: user.image ? user.image : undefined,
         };
       }

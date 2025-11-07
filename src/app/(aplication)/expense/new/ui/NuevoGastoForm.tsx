@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { createGasto } from "@/actions/gasto/createGasto";
+import {
+  ActionResult,
+  createGasto,
+  GastoData,
+} from "@/actions/gasto/createGasto";
 import { uploadBoleta } from "@/actions/gasto/uploadBoleta";
 
 interface DistributionInput {
@@ -17,10 +21,9 @@ export default function NuevoGastoForm({ eventoId }: { eventoId?: string }) {
   const [percent, setPercent] = useState<string>("");
 
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<ActionResult<GastoData> | null>(null);
 
   // Estado para la boleta
-  const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptUrl, setReceiptUrl] = useState<string | undefined>(undefined);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
 
@@ -56,7 +59,6 @@ export default function NuevoGastoForm({ eventoId }: { eventoId?: string }) {
     setUploadingReceipt(false);
 
     if (res.success) {
-      setReceiptFile(file);
       setReceiptUrl(res.url);
     } else {
       alert("Error subiendo boleta: " + res.error);
@@ -90,7 +92,6 @@ export default function NuevoGastoForm({ eventoId }: { eventoId?: string }) {
     if (res.success) {
       setAmount("");
       setDistributions([]);
-      setReceiptFile(null);
       setReceiptUrl(undefined);
     }
   };

@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default async function Home({ searchParams }: Props) {
-  const resolvedParams = await searchParams;
+  // const resolvedParams = await searchParams;
 
   // const page = resolvedParams.page ? parseInt(resolvedParams.page) : 1;
 

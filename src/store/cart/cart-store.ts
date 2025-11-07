@@ -1,7 +1,6 @@
 import { CartProduct } from "@/interfaces";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Product } from "../../generated/prisma/index";
 
 interface State {
   cart: CartProduct[];
