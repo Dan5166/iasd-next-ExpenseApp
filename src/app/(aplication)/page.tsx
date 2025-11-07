@@ -2,13 +2,14 @@ export const revalidate = 60;
 
 import { Title } from "@/components";
 
-interface Props {
-  searchParams: {
-    page?: string;
-  };
-}
+// interface Props {
+//   searchParams: {
+//     page?: string;
+//   };
+// }
 
-export default async function Home({ searchParams }: Props) {
+export default async function Home() {
+  // { searchParams }: Props
   // const resolvedParams = await searchParams;
 
   // const page = resolvedParams.page ? parseInt(resolvedParams.page) : 1;

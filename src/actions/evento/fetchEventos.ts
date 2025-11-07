@@ -7,6 +7,7 @@ export async function fetchEventos() {
     const snapshot = await adminDB.collection("eventos").get();
 
     const eventos = snapshot.docs.map((doc) => {
+      console.log("DOC EVENTO: ", doc.id, doc.data());
       const data = doc.data();
 
       return {
