@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import { loginEmailPassFirebase } from "./lib/firebaseClient";
 import { adminAuth } from "./lib/firebaseAdmin";
-import { Session, User, AdapterUser } from "next-auth";
+import { Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
 interface JWTData {
@@ -101,12 +101,12 @@ export const authConfig: NextAuthConfig = {
     async jwt({ token, user }: { token: JWT; user?: User }) {
       if (user) {
         token.data = {
-          id: user.id,
+          id: user.id!,
           name: user.name!,
           email: user.email!,
           emailVerified: user.emailVerified ?? false,
           role: (user as any).role ?? "user", // si tu modelo User tiene `role`
-          image: user.image,
+          image: user.image ? user.image : undefined,
         };
       }
       return token;
