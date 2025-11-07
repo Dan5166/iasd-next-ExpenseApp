@@ -30,6 +30,8 @@ export default async function Page() {
     );
   }
 
+  console.log("EVENTOS CARGADOS:      ", res);
+
   const eventos = res.data;
 
   const eventosConTotales = await Promise.all(
