@@ -48,8 +48,8 @@ export async function createEventoGasto(
       id: ref.id,
       data: eventoGasto,
     };
-  } catch (error: any) {
-    console.error("Error creando evento de gasto:", error);
-    return { success: false, error: error.message };
+  } catch (error) {
+    console.error("Error creando evento gasto:", error);
+    return { success: false, error: "Error creando evento gasto" };
   }
 }
