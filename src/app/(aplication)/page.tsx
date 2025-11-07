@@ -1,4 +1,4 @@
-export const revalidate = 60; // 1 minute
+// export const revalidate = 60; // 1 minute
 
 import { Title } from "@/components";
 
