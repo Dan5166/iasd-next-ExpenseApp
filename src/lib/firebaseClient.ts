@@ -1,12 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { getApp, getApps, initializeApp } from "firebase/app";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  type UserCredential,
-} from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
-import { getAnalytics } from "firebase/analytics";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -62,10 +58,13 @@ export interface FirestoreUser {
 export const loginEmailPassFirebase = async ({
   email,
   password,
-}: LoginProps): Promise<FirestoreUser> => {
+}: LoginProps): Promise<{ userData: FirestoreUser; idToken: string }> => {
   const firebaseRes = await signInWithEmailAndPassword(auth, email, password);
   const userRef = doc(db, "users", firebaseRes.user.uid);
   const userSnap = await getDoc(userRef);
+
+  // 🔹 Obtener el ID Token del usuario autenticado
+  const idToken = await firebaseRes.user.getIdToken();
 
   let userData: FirestoreUser;
 
@@ -76,7 +75,7 @@ export const loginEmailPassFirebase = async ({
       name: firebaseRes.user.displayName ?? "",
       email: firebaseRes.user.email ?? "",
       emailVerified: firebaseRes.user.emailVerified,
-      role: "admin", // puedes cambiarlo si quieres asignar según dominio, etc.
+      role: "user", // 🔸 Usa 'user' por defecto, ajusta si necesitas admin
       image: firebaseRes.user.photoURL ?? "",
       createdAt: new Date().toISOString(),
     };
@@ -101,5 +100,5 @@ export const loginEmailPassFirebase = async ({
     console.log("ℹ️ Usuario existente en Firestore:", userData);
   }
 
-  return userData;
+  return { userData, idToken };
 };

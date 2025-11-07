@@ -1,6 +1,5 @@
 "use server";
 
-import { Gasto } from "@/interfaces";
 import { adminDB } from "@/lib/firebaseAdmin";
 import { Timestamp } from "firebase-admin/firestore";
 

@@ -24,8 +24,15 @@ export async function fetchEventos() {
     });
 
     return { success: true, data: eventos };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error obteniendo eventos:", error);
-    return { success: false, data: [], error: error.message };
+
+    let message = "Error desconocido";
+
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    return { success: false, data: [], error: message };
   }
 }

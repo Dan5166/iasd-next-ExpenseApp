@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createEvento } from "@/actions/evento/createEvento";
+import {
+  createEvento,
+  CreateEventoResult,
+} from "@/actions/evento/createEvento";
 import { fetchUnassignedGastos } from "@/actions/gasto/fetchUnassignedGastos";
 
 interface Gasto {
@@ -17,7 +20,7 @@ export default function NewEventoPage() {
   const [gastos, setGastos] = useState<Gasto[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<CreateEventoResult>();
 
   // Cargar gastos sin asignar
   useEffect(() => {
@@ -76,15 +79,15 @@ export default function NewEventoPage() {
           {gastos.length === 0 ? (
             <p className="text-sm text-gray-500">No hay gastos disponibles</p>
           ) : (
-            <ul className="border rounded-md divide-y">
+            <ul className="rounded-md divide-y">
               {gastos.map((g) => (
                 <li
                   key={g.id}
                   onClick={() => toggleSelect(g.id)}
-                  className={`p-3 cursor-pointer flex justify-between ${
+                  className={`bg-gray-50 border-1 p-3 cursor-pointer flex justify-between rounded-md ${
                     selected.includes(g.id)
                       ? "bg-indigo-100 border-l-4 border-indigo-600"
-                      : "hover:bg-gray-50"
+                      : "hover:bg-gray-50 border-gray-600"
                   }`}
                 >
                   <div>

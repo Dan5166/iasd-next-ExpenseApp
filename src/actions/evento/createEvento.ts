@@ -9,11 +9,15 @@ interface CreateEventoInput {
   gastoIds: string[];
 }
 
+export type CreateEventoResult =
+  | { success: true; id: string }
+  | { success: false; error: string };
+
 export async function createEvento({
   nombre,
   fecha,
   gastoIds,
-}: CreateEventoInput) {
+}: CreateEventoInput): Promise<CreateEventoResult> {
   const batch = adminDB.batch();
 
   try {

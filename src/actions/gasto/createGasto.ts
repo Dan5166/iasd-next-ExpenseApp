@@ -47,8 +47,15 @@ export async function createGasto(gastoInput: GastoInput) {
       id: ref.id,
       data: plainData, // ✅ serializable
     };
-  } catch (error: any) {
-    console.error("Error creando gasto:", error);
-    return { success: false, error: error.message };
+  } catch (error) {
+    console.error("Error obteniendo eventos:", error);
+
+    let message = "Error desconocido";
+
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    return { success: false, error: message };
   }
 }

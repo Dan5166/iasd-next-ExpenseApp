@@ -1,9 +1,8 @@
 import NextAuth, { type NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
-import prisma from "./lib/prisma";
-import * as bcryptjs from "bcryptjs";
 import { loginEmailPassFirebase } from "./lib/firebaseClient";
+import { adminAuth } from "./lib/firebaseAdmin";
 
 // Rutas que requieren que el usuario esté autenticado (cualquier rol)
 const authenticatedRoutes = [
@@ -104,32 +103,54 @@ export const authConfig: NextAuthConfig = {
   providers: [
     Credentials({
       async authorize(credentials) {
+        // 1️⃣ Validar los datos de entrada
         const parsedCredentials = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
+          .object({
+            email: z.string().email(),
+            password: z.string().min(6),
+          })
           .safeParse(credentials);
 
         if (!parsedCredentials.success) return null;
 
         const { email, password } = parsedCredentials.data;
-        console.log("--- AUTH CONFIG ---");
-        console.log({ email, password });
-        console.log("------------------");
 
-        // Verificamos si existe en Prisma
-        // const existingUser = await prisma.user.findUnique({
-        //   where: { email: email.toLowerCase() },
-        // });
-        //
-        // if (!existingUser) return null;
+        try {
+          console.log("🔥 Intentando login con Firebase:", email);
 
-        // Login con Firebase
-        const firebaseRes = await loginEmailPassFirebase({ email, password });
+          // 2️⃣ Iniciar sesión con Firebase (SDK cliente)
+          const { userData, idToken } = await loginEmailPassFirebase({
+            email,
+            password,
+          });
 
-        // ✅ Devolvemos un User plano (no el UserCredential)
-        return firebaseRes;
+          // 3️⃣ Verificar el ID token con Firebase Admin (en el servidor)
+          const decodedToken = await adminAuth.verifyIdToken(idToken);
+
+          // 4️⃣ Retornar un objeto plano que NextAuth guardará como sesión
+          return {
+            id: decodedToken.uid,
+            email: decodedToken.email,
+            name: userData.name,
+            role: userData.role,
+            emailVerified: decodedToken.email_verified,
+            image: userData.image,
+          };
+        } catch (err) {
+          console.error("❌ Error en authorize Firebase:", err);
+          return null;
+        }
       },
     }),
   ],
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 días
+    updateAge: 24 * 60 * 60, // se refresca cada 24h
+  },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 días también (coincidir con session)
+  },
 };
 
 // export const { signIn, signOut, auth: middleware } = NextAuth(authConfig);

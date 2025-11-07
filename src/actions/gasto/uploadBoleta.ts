@@ -23,7 +23,9 @@ export async function uploadBoleta(file: File) {
     });
 
     // Generar signed URL que expira en 1 hora
-    const expiresAt = Date.now() + 60 * 60 * 1000; // 1 hora
+    // 7 días * 24 horas/día * 60 minutos/hora * 60 segundos/minuto * 1000 milisegundos/segundo
+    const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+    const expiresAt = Date.now() + ONE_WEEK_MS;
     const [signedUrl] = await fileRef.getSignedUrl({
       action: "read",
       expires: new Date(expiresAt),

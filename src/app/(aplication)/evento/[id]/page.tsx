@@ -1,7 +1,7 @@
 import { adminDB } from "@/lib/firebaseAdmin";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import Link from "next/link";
+import EditarEventoForm from "./ui/EditEventoForm";
 
 function parseFirestoreDate(dateValue: any): Date | null {
   if (!dateValue) return null;
@@ -86,9 +86,14 @@ export default async function EventoDetallePage({
     <div className="p-8 space-y-6">
       {/* 🔹 Info general del evento */}
       <div className="border border-gray-200 rounded-xl p-6">
-        <h1 className="text-2xl font-semibold mb-4">
-          {evento.nombre ?? "Sin nombre"}
-        </h1>
+        <EditarEventoForm
+          evento={{
+            id: paramsAwaited.id,
+            nombre: evento.nombre || "",
+            fecha: fecha ? fecha.toISOString() : "",
+            gastoIds: evento.gastoIds || [],
+          }}
+        />
 
         <div className="space-y-1 text-gray-700">
           <p>

@@ -25,8 +25,15 @@ export async function fetchAllGastos() {
     });
 
     return { success: true, data: gastos };
-  } catch (error: any) {
-    console.error("Error obteniendo gastos:", error);
-    return { success: false, data: [], error: error.message };
+  } catch (error) {
+    console.error("Error obteniendo eventos:", error);
+
+    let message = "Error desconocido";
+
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    return { success: false, data: [], error: message };
   }
 }
