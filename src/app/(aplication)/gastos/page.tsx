@@ -1,4 +1,7 @@
 import { fetchAllGastos } from "@/actions/gasto/fetchAllGastos";
+// En GastosPage.js
+
+export const dynamic = "force-dynamic"; // 👈 Añade esta línea
 
 export default async function GastosPage() {
   const res = await fetchAllGastos();

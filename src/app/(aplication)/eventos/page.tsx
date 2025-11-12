@@ -4,6 +4,8 @@ import { adminDB } from "@/lib/firebaseAdmin";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
+export const dynamic = "force-dynamic"; // 👈 Añade esta línea
+
 async function getTotalForEvento(gastoIds: string[]): Promise<number> {
   if (!gastoIds.length) return 0;
 
